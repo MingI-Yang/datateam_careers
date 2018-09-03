@@ -82,32 +82,44 @@ dataset = np.load('./datasets/v0_eigens.npz')
 # NOTE: calculate the size of training set and validation set
 #       all pre-processed features are inside 'train_eigens'
 train_data_size = dataset['train_eigens'].shape[0]
-valid_data_size = train_data_size // 5
+
+portion = 5
+valid_data_size = train_data_size // portion
 train_data_size = train_data_size - valid_data_size
 
-# NOTE: split dataset
-train_data = dataset['train_eigens'][:train_data_size]
-valid_data = dataset['train_eigens'][train_data_size:]
+# NOTE: split dataset, cross validation
+for i in range(portion):
+   if i!=0&&i!=portion-1:
+      train_data = dataset['train_eigens'][:i*valid_data_size-1,(i+1)*valid_data_size:]
+      valid_data = dataset['train_eigens'][i*valid_data_size:(i+1)*valid_data_size]
+   elif i==0:
+      train_data = dataset['train_eigens'][valid_data_size+1:]
+      valid_data = dataset['train_eigens'][:valid_data_size]
+   else:
+      train_data = dataset['train_eigens'][:i*valid_data_size-1]
+      valid_data = dataset['train_eigens'][i*valid_data_size:]
 
 # NOTE: a 896d feature vector for each user, the 28d vector in the end are
 #       labels
 #       896 = 32 (weeks) x 7 (days a week) x 4 (segments a day)
-train_eigens = train_data[:, :-28].reshape(-1, 896)
-train_labels = train_data[:, -28:]
+   train_eigens = train_data[:, :-28].reshape(-1, 896)
+   train_labels = train_data[:, -28:]
 
-valid_eigens = valid_data[:, :-28].reshape(-1, 896)
-valid_labels = valid_data[:, -28:]
+   valid_eigens = valid_data[:, :-28].reshape(-1, 896)
+   valid_labels = valid_data[:, -28:]
 
 # NOTE: read features of test set
-test_eigens = dataset['issue_eigens'][:, :-28].reshape(-1, 896)
+   test_eigens = dataset['issue_eigens'][:, :-28].reshape(-1, 896)
 
 # NOTE: check the shape of the prepared dataset
-print('train_eigens.shape = {}'.format(train_eigens.shape))
-print('train_labels.shape = {}'.format(train_labels.shape))
-print('valid_eigens.shape = {}'.format(valid_eigens.shape))
-print('valid_labels.shape = {}'.format(valid_labels.shape))
+   print('train_eigens.shape = {}'.format(train_eigens.shape))
+   print('train_labels.shape = {}'.format(train_labels.shape))
+   print('valid_eigens.shape = {}'.format(valid_eigens.shape))
+   print('valid_labels.shape = {}'.format(valid_labels.shape))
 
 # NOTE: predict and save
-test_guesss = predict(test_eigens)
+   test_guesss = predict(test_eigens)
+   acc[i] = sum(test_guess-)
+
 
 write_result('dnn.csv', test_guesss)
