@@ -110,4 +110,4 @@ print('valid_labels.shape = {}'.format(valid_labels.shape))
 # NOTE: predict and save
 test_guesss = predict(test_eigens)
 
-write_result('dnn.csv', test_guesss)
+# write_result('dnn.csv', test_guesss)
